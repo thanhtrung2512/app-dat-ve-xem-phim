@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'gift_detail_screen.dart';
+import 'payment_screen.dart';
 
 class GiftScreen extends StatelessWidget {
   const GiftScreen({super.key});
@@ -194,7 +194,11 @@ class GiftScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => GiftDetailScreen(item: item),
+                        builder: (context) => PaymentScreen(
+                          giftItem: item,
+                          quantity: 1,
+                          totalPrice: int.parse(item["price"].replaceAll(RegExp(r'[^0-9]'), '')),
+                        ),
                       ),
                     );
                   },

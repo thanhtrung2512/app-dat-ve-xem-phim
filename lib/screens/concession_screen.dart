@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'payment_screen.dart';
 
 class ConcessionScreen extends StatefulWidget {
   final Map movie;
@@ -238,7 +239,19 @@ class _ConcessionScreenState extends State<ConcessionScreen> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          // TODO: Navigate to Payment
+                          List<Map<String, dynamic>> selectedCombos = combos.where((c) => (c["quantity"] ?? 0) > 0).toList();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => PaymentScreen(
+                                movie: widget.movie,
+                                timeData: widget.timeData,
+                                selectedSeats: widget.selectedSeats,
+                                selectedCombos: selectedCombos,
+                                totalPrice: finalTotal,
+                              ),
+                            ),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryRed,

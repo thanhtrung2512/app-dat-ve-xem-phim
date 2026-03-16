@@ -1,13 +1,26 @@
 import 'package:flutter/material.dart';
+import 'success_screen.dart';
 
 class PaymentScreen extends StatefulWidget {
-  final Map<String, dynamic> item;
-  final int quantity;
+  final Map? movie;
+  final Map? timeData;
+  final List<String>? selectedSeats;
+  final List<Map<String, dynamic>>? selectedCombos;
+  final int totalPrice;
+  
+  // For Gift purchases
+  final Map<String, dynamic>? giftItem;
+  final int? quantity;
 
   const PaymentScreen({
     super.key,
-    required this.item,
-    required this.quantity,
+    this.movie,
+    this.timeData,
+    this.selectedSeats,
+    this.selectedCombos,
+    required this.totalPrice,
+    this.giftItem,
+    this.quantity,
   });
 
   @override
@@ -15,25 +28,84 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  bool _isAgreed = false;
+  final Color primaryRed = const Color(0xFFE51937);
+  final Color darkBg = const Color(0xFF0A0A0A);
+  String? selectedMethod;
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF1A1A1A),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentMethod(IconData icon, String label, String methodId) {
+    bool isSelected = selectedMethod == methodId;
+    return GestureDetector(
+      onTap: () => setState(() => selectedMethod = methodId),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? primaryRed : Colors.black.withValues(alpha: 0.05),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isSelected ? primaryRed.withValues(alpha: 0.1) : Colors.grey[50],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 24, color: isSelected ? primaryRed : Colors.black54),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 16, 
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  color: isSelected ? Colors.black : Colors.black87,
+                ),
+              ),
+            ),
+            if (isSelected)
+              Icon(Icons.check_circle, color: primaryRed, size: 26)
+            else
+              Icon(Icons.circle_outlined, color: Colors.black.withValues(alpha: 0.1), size: 26),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryRed = Color(0xFFE51937);
-    final int priceVal = int.parse(widget.item["price"].replaceAll(RegExp(r'[^0-9]'), ''));
-    final int totalAmount = priceVal * widget.quantity;
-    final String formattedTotal = "${totalAmount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ";
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: Colors.black, // Nền bên ngoài màu đen
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 500),
-          child: Column(
-            children: [
-              // --- HEADER ---
-              Container(
-                color: primaryRed,
+          child: Container(
+            color: const Color(0xFFF9F9F9), // Nền bên trong màu trắng/xám nhạt
+            child: Column(
+              children: [
+                // --- HEADER ---
+                Container(
+                  color: primaryRed,
                 child: SafeArea(
                   bottom: false,
                   child: Padding(
@@ -46,10 +118,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         ),
                         const Expanded(
                           child: Center(
-                            child: Text(
-                              "Thanh toán",
-                              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
+                            child: Text("Thanh toán", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                           ),
                         ),
                         const SizedBox(width: 48),
@@ -60,200 +129,236 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
 
               Expanded(
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: [
-                    // --- TÓM TẮT SẢN PHẨM ---
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      color: Colors.white,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Thumbnail Vé
-                          Container(
-                            width: 100,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: Colors.black12),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // --- THÔNG TIN PHIM HOẶC QUÀ TẶNG ---
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+                        ),
+                        child: widget.movie != null ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.asset(
+                                widget.movie!["img"],
+                                width: 85,
+                                height: 125,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: _buildMiniTicket(widget.item),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          // Thông tin
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  widget.item["name"],
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2C3E50)),
-                                ),
-                                const SizedBox(height: 4),
-                                Text("Số lượng: ${widget.quantity}", style: const TextStyle(color: Colors.black54)),
-                                const SizedBox(height: 2),
-                                RichText(
-                                  text: const TextSpan(
-                                    style: TextStyle(color: Colors.black54, fontSize: 13),
-                                    children: [
-                                      TextSpan(text: "Hạn sử dụng:"),
-                                      TextSpan(text: " Quà tặng online", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
-                                    ],
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.movie!["name"].toString().toUpperCase(),
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, height: 1.2),
                                   ),
-                                ),
-                                const Text("2026-03-16 ~ 2027-03-16", style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 12),
-                                Text(
-                                  formattedTotal,
-                                  style: const TextStyle(fontSize: 16, color: primaryRed, fontWeight: FontWeight.w500),
-                                ),
-                              ],
+                                  const SizedBox(height: 10),
+                                  _buildInfoItem(Icons.access_time, "${widget.timeData?["start"] ?? ""} ~ ${widget.timeData?["end"] ?? ""}"),
+                                  const SizedBox(height: 4),
+                                  _buildInfoItem(Icons.meeting_room_outlined, widget.timeData?["room"] ?? "Rạp 1"),
+                                  const SizedBox(height: 4),
+                                  _buildInfoItem(Icons.location_on_outlined, "TT CINEMA Hà Đông"),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    "Ghế: ${widget.selectedSeats?.join(', ') ?? ""}",
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: primaryRed),
+                                  ),
+                                ],
+                              ),
                             ),
+                          ],
+                        ) : (widget.giftItem != null ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 90,
+                              height: 90,
+                              decoration: BoxDecoration(
+                                color: Color(widget.giftItem!["bgColor"]).withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Color(widget.giftItem!["bgColor"]).withValues(alpha: 0.2)),
+                              ),
+                              child: Center(
+                                child: Icon(Icons.card_giftcard, color: Color(widget.giftItem!["bgColor"]), size: 40),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.giftItem!["name"],
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    widget.giftItem!["subtitle"] ?? "",
+                                    style: const TextStyle(color: Colors.black54, fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    "Số lượng: ${widget.quantity}",
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ) : const SizedBox()),
+                      ),
+
+                      // --- THÔNG TIN COMBO (NẾU CÓ) ---
+                      if (widget.selectedCombos != null && widget.selectedCombos!.isNotEmpty) ...[
+                        const SizedBox(height: 20),
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
                           ),
-                        ],
-                      ),
-                    ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.fastfood_outlined, size: 20, color: Colors.black54),
+                                  const SizedBox(width: 8),
+                                  const Text("Bắp & Nước", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black54)),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              ...widget.selectedCombos!.map((combo) => Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(6),
+                                      child: combo["img"] != null
+                                          ? Image.asset(
+                                              combo["img"],
+                                              width: 50,
+                                              height: 50,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Container(
+                                              width: 50,
+                                              height: 50,
+                                              color: Colors.grey[100],
+                                              child: const Icon(Icons.fastfood, size: 24, color: Colors.black26),
+                                            ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "${combo["name"]} (x${combo["quantity"]})",
+                                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black87),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            "${combo["onlinePrice"]} đ",
+                                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black54),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                            ],
+                          ),
+                        ),
+                      ],
 
-                    const SizedBox(height: 10),
+                      // --- PHƯƠNG THỨC THANH TOÁN ---
+                      _buildSectionTitle("Phương thức thanh toán"),
+                      
+                      _buildPaymentMethod(Icons.credit_card_outlined, "Thẻ tín dụng", "credit"),
+                      _buildPaymentMethod(Icons.account_balance_outlined, "Thẻ nội địa (ATM)", "atm"),
+                      _buildPaymentMethod(Icons.account_balance_wallet_outlined, "Ví điện tử", "wallet"),
 
-                    // --- PHƯƠNG THỨC THANH TOÁN ---
-                    Container(
-                      color: Colors.white,
-                      child: Column(
-                        children: [
-                          _buildPaymentOption(Icons.credit_card, "Thẻ tín dụng"),
-                          _buildPaymentOption(Icons.account_balance, "Thẻ nội địa (ATM)"),
-                          _buildPaymentOption(Icons.account_balance_wallet, "Ví điện tử", subtitle: "Momo, VNPay, Zalopay, ShopeePay"),
-                          _buildPaymentOption(Icons.history_edu, "Ví trả sau", subtitle: "Lotte C&F, Muadee, Fundiin, Home Paylat..."),
-                          _buildPaymentOption(Icons.qr_code_scanner, "VietQR", isLast: true),
-                        ],
-                      ),
-                    ),
-                  ],
+                      const SizedBox(height: 120), 
+                    ],
+                  ),
                 ),
               ),
 
               // --- BOTTOM BAR ---
               Container(
-                decoration: const BoxDecoration(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                decoration: BoxDecoration(
                   color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))],
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 20, offset: const Offset(0, -5))],
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                 ),
-                padding: const EdgeInsets.all(16),
                 child: SafeArea(
                   top: false,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                  child: Row(
                     children: [
-                      // Agreement Checkbox
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: _isAgreed,
-                            onChanged: (v) => setState(() => _isAgreed = v ?? false),
-                            activeColor: primaryRed,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                          ),
-                          Expanded(
-                            child: RichText(
-                              text: const TextSpan(
-                                style: TextStyle(color: Colors.black87, fontSize: 13, height: 1.4),
-                                children: [
-                                  TextSpan(text: "Tôi đã đọc và đồng ý với "),
-                                  TextSpan(text: "Điều kiện & Điều khoản", style: TextStyle(color: primaryRed, decoration: TextDecoration.underline)),
-                                  TextSpan(text: ", cam kết mua vé xem phim cho người đúng độ tuổi quy định"),
-                                ],
-                              ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text("Tổng Tiền", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black54, letterSpacing: 0.5)),
+                            const SizedBox(height: 4),
+                            Text(
+                              "${widget.totalPrice} đ",
+                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: primaryRed),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 16),
-                      // Price & Pay Button
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text("Tổng Tiền", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                Row(
-                                  children: [
-                                    Text(
-                                      formattedTotal,
-                                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: primaryRed),
-                                    ),
-                                    const Icon(Icons.keyboard_arrow_up, color: Colors.black54),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: _isAgreed ? () {} : null,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryRed,
-                                foregroundColor: Colors.white,
-                                disabledBackgroundColor: Colors.grey.shade300,
-                                minimumSize: const Size(double.infinity, 54),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                elevation: 0,
-                              ),
-                              child: const Text("Thanh toán", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                            ),
-                          ),
-                        ],
+                      ElevatedButton(
+                        onPressed: (selectedMethod != null) ? () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const SuccessScreen()),
+                          );
+                        } : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryRed,
+                          disabledBackgroundColor: Colors.grey[200],
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(horizontal: 44, vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+                        ),
+                        child: const Text("Thanh toán", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
                 ),
               ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildPaymentOption(IconData icon, String title, {String? subtitle, bool isLast = false}) {
-    return Column(
+  Widget _buildInfoItem(IconData icon, String text) {
+    return Row(
       children: [
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-          leading: Icon(icon, color: Colors.black87, size: 28),
-          title: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-          subtitle: subtitle != null ? Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.black45)) : null,
-          trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black26),
-          onTap: () {},
-        ),
-        if (!isLast) const Divider(height: 1, indent: 20, endIndent: 20, color: Colors.black12),
+        Icon(icon, size: 14, color: Colors.black38),
+        const SizedBox(width: 6),
+        Text(text, style: const TextStyle(color: Colors.black54, fontSize: 13)),
       ],
-    );
-  }
-
-  Widget _buildMiniTicket(Map<String, dynamic> item) {
-    final Color bgColor = Color(item["bgColor"]);
-    final Color textColor = Color(item["textColor"]);
-    final bool isCharlotte = item["label"] == "CHARLOTTE";
-    
-    return Container(
-      color: bgColor,
-      child: Center(
-        child: isCharlotte 
-          ? Text("CHARLOTTE", style: TextStyle(color: textColor, fontSize: 8, letterSpacing: 1, fontWeight: FontWeight.bold))
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("GIFT", style: TextStyle(color: textColor, fontSize: 10, fontWeight: FontWeight.bold)),
-                Text("TICKET", style: TextStyle(color: textColor, fontSize: 10, fontWeight: FontWeight.bold)),
-              ],
-            ),
-      ),
     );
   }
 }
