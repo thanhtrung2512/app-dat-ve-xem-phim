@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'movie_screen.dart';
 import 'showtime_screen.dart'; // Đã import ShowtimeScreen
+import 'gift_screen.dart'; // Import màn hình Quà tặng
 
 // ==========================================
 // 1. CÁC TRANG DUMMY (CÁC TRANG ĐÍCH KHI BẤM NÚT)
@@ -36,7 +37,7 @@ class MovieDetailScreen extends StatelessWidget {
 
 class TicketPage extends StatelessWidget { const TicketPage({super.key}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text("Vé của tôi"), backgroundColor: const Color(0xFF0A0A0A)), backgroundColor: const Color(0xFF0A0A0A), body: const Center(child: Text("Danh sách vé của bạn", style: TextStyle(color: Colors.white, fontSize: 18)))); }
 class ProfilePage extends StatelessWidget { const ProfilePage({super.key}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text("Hồ sơ"), backgroundColor: const Color(0xFF0A0A0A)), backgroundColor: const Color(0xFF0A0A0A), body: const Center(child: Text("Thông tin cá nhân", style: TextStyle(color: Colors.white, fontSize: 18)))); }
-class GiftScreen extends StatelessWidget { const GiftScreen({super.key}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text("Quà tặng"), backgroundColor: const Color(0xFF0A0A0A)), backgroundColor: const Color(0xFF0A0A0A), body: const Center(child: Text("Quà tặng và Ưu đãi", style: TextStyle(color: Colors.white, fontSize: 18)))); }
+// GiftScreen đã được chuyển sang gift_screen.dart
 class CinemaPage extends StatelessWidget { const CinemaPage({super.key}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text("Hệ thống Rạp"), backgroundColor: const Color(0xFF0A0A0A)), backgroundColor: const Color(0xFF0A0A0A), body: const Center(child: Text("Danh sách Rạp TT CINEMA", style: TextStyle(color: Colors.white, fontSize: 18)))); }
 class PromotionScreen extends StatelessWidget { const PromotionScreen({super.key}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text("Khuyến mãi"), backgroundColor: const Color(0xFF0A0A0A)), backgroundColor: const Color(0xFF0A0A0A), body: const Center(child: Text("Các chương trình khuyến mãi", style: TextStyle(color: Colors.white, fontSize: 18)))); }
 

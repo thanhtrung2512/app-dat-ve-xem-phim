@@ -182,7 +182,8 @@ class _ShowtimeScreenState extends State<ShowtimeScreen> with SingleTickerProvid
     
     return ListView.separated(
       itemCount: cinemas.length,
-      separatorBuilder: (_, _) => Container(height: 8, color: const Color(0xFFF7F7F7)),      itemBuilder: (context, index) {
+      separatorBuilder: (_, _) => Container(height: 8, color: const Color(0xFFF7F7F7)),
+      itemBuilder: (context, index) {
         final cinema = cinemas[index];
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
