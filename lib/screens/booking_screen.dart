@@ -27,7 +27,7 @@ class _BookingScreenState extends State<BookingScreen> {
   // Danh sách ghế người dùng đang chọn
   List<String> selectedSeats = [];
 
-  // Hàm xử lý khi bấm vào 1 ghế
+  //  khi bấm vào 1 ghế
   void _toggleSeat(String seatId) {
     if (soldSeats.contains(seatId)) return; // Ghế đã bán thì không làm gì cả
     
@@ -87,7 +87,7 @@ class _BookingScreenState extends State<BookingScreen> {
     String movieName = widget.movie["name"] ?? "UNKNOWN";
     String timeInfo = widget.timeData != null 
         ? "2D Phụ đề tiếng Anh | ${widget.timeData!["start"]} ~ ${widget.timeData!["end"]}"
-        : "2D Phụ đề tiếng Anh | 21:35~24:01"; // Mặc định nếu không có
+        : "2D Phụ đề tiếng Anh | 21:35~24:01"; 
 
     return Scaffold(
       backgroundColor: darkBg,
@@ -103,7 +103,7 @@ class _BookingScreenState extends State<BookingScreen> {
             Positioned.fill(
               child: Column(
                 children: [
-                  // --- 1. HEADER KHÔNG VIỀN TRÔNG HIỆN ĐẠI ---
+                  // --- 1. HEADER  ---
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     child: Row(
@@ -217,7 +217,7 @@ class _BookingScreenState extends State<BookingScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Tạm tính: ${selectedSeats.length * ticketPrice} đ", // Bạn có thể thêm hàm format chuỗi tiền tệ sau
+                            "Tạm tính: ${selectedSeats.length * ticketPrice} đ", 
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: primaryRed),
                           ),
                         ],
