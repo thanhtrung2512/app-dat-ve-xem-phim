@@ -8,7 +8,6 @@ class PaymentScreen extends StatefulWidget {
   final List<Map<String, dynamic>>? selectedCombos;
   final int totalPrice;
   
-  // For Gift purchases
   final Map<String, dynamic>? giftItem;
   final int? quantity;
 
@@ -32,60 +31,40 @@ class _PaymentScreenState extends State<PaymentScreen> {
   final Color darkBg = const Color(0xFF0A0A0A);
   String? selectedMethod;
 
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Color(0xFF1A1A1A),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPaymentMethod(IconData icon, String label, String methodId) {
+  // --- WIDGET CHỌN PHƯƠNG THỨC GỌN GÀNG ---
+  Widget _buildPaymentOption(IconData icon, String label, String methodId) {
     bool isSelected = selectedMethod == methodId;
     return GestureDetector(
       onTap: () => setState(() => selectedMethod = methodId),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          color: isSelected ? Colors.white : Colors.black.withValues(alpha: 0.03),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? primaryRed : Colors.black.withValues(alpha: 0.05),
-            width: 1,
+            color: isSelected ? primaryRed : Colors.transparent,
+            width: 1.5,
           ),
         ),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: isSelected ? primaryRed.withValues(alpha: 0.1) : Colors.grey[50],
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 24, color: isSelected ? primaryRed : Colors.black54),
-            ),
+            Icon(icon, size: 22, color: isSelected ? primaryRed : Colors.black45),
             const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 16, 
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected ? Colors.black : Colors.black87,
-                ),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? primaryRed : Colors.black87,
               ),
             ),
+            const Spacer(),
             if (isSelected)
-              Icon(Icons.check_circle, color: primaryRed, size: 26)
+              Icon(Icons.check_circle, color: primaryRed, size: 20)
             else
-              Icon(Icons.circle_outlined, color: Colors.black.withValues(alpha: 0.1), size: 26),
+              const Icon(Icons.circle_outlined, color: Colors.black12, size: 20),
           ],
         ),
       ),
@@ -95,17 +74,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Nền bên ngoài màu đen
+      backgroundColor: darkBg,
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 500),
-          child: Container(
-            color: const Color(0xFFF9F9F9), // Nền bên trong màu trắng/xám nhạt
-            child: Column(
-              children: [
-                // --- HEADER ---
-                Container(
-                  color: primaryRed,
+          child: Column(
+            children: [
+              // --- HEADER ĐỒNG BỘ VỚI CONCESSION SCREEN ---
+              Container(
+                color: primaryRed,
                 child: SafeArea(
                   bottom: false,
                   child: Padding(
@@ -129,236 +106,128 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
 
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // --- THÔNG TIN PHIM HOẶC QUÀ TẶNG ---
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
-                        ),
-                        child: widget.movie != null ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.asset(
-                                widget.movie!["img"],
-                                width: 85,
-                                height: 125,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    widget.movie!["name"].toString().toUpperCase(),
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, height: 1.2),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  _buildInfoItem(Icons.access_time, "${widget.timeData?["start"] ?? ""} ~ ${widget.timeData?["end"] ?? ""}"),
-                                  const SizedBox(height: 4),
-                                  _buildInfoItem(Icons.meeting_room_outlined, widget.timeData?["room"] ?? "Rạp 1"),
-                                  const SizedBox(height: 4),
-                                  _buildInfoItem(Icons.location_on_outlined, "TT CINEMA Hà Đông"),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    "Ghế: ${widget.selectedSeats?.join(', ') ?? ""}",
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: primaryRed),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ) : (widget.giftItem != null ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 90,
-                              height: 90,
-                              decoration: BoxDecoration(
-                                color: Color(widget.giftItem!["bgColor"]).withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Color(widget.giftItem!["bgColor"]).withValues(alpha: 0.2)),
-                              ),
-                              child: Center(
-                                child: Icon(Icons.card_giftcard, color: Color(widget.giftItem!["bgColor"]), size: 40),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    widget.giftItem!["name"],
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    widget.giftItem!["subtitle"] ?? "",
-                                    style: const TextStyle(color: Colors.black54, fontSize: 14),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    "Số lượng: ${widget.quantity}",
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ) : const SizedBox()),
-                      ),
-
-                      // --- THÔNG TIN COMBO (NẾU CÓ) ---
-                      if (widget.selectedCombos != null && widget.selectedCombos!.isNotEmpty) ...[
-                        const SizedBox(height: 20),
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+                child: Container(
+                  color: Colors.white,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // --- CHI TIẾT ĐƠN HÀNG GỘP ---
+                        const Text("CHI TIẾT ĐƠN HÀNG", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black38, letterSpacing: 1)),
+                        const SizedBox(height: 16),
+                        
+                        if (widget.movie != null) ...[
+                          Text(widget.movie!["name"].toString().toUpperCase(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, height: 1.2)),
+                          const SizedBox(height: 8),
+                          Text(
+                            "${widget.timeData?["start"]} • ${widget.timeData?["room"]} • Ghế ${widget.selectedSeats?.join(', ')}",
+                            style: const TextStyle(color: Colors.black54, fontSize: 14),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(Icons.fastfood_outlined, size: 20, color: Colors.black54),
-                                  const SizedBox(width: 8),
-                                  const Text("Bắp & Nước", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black54)),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              ...widget.selectedCombos!.map((combo) => Padding(
-                                padding: const EdgeInsets.only(bottom: 16),
-                                child: Row(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(6),
-                                      child: combo["img"] != null
-                                          ? Image.asset(
-                                              combo["img"],
-                                              width: 50,
-                                              height: 50,
-                                              fit: BoxFit.cover,
-                                            )
-                                          : Container(
-                                              width: 50,
-                                              height: 50,
-                                              color: Colors.grey[100],
-                                              child: const Icon(Icons.fastfood, size: 24, color: Colors.black26),
-                                            ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "${combo["name"]} (x${combo["quantity"]})",
-                                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black87),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            "${combo["onlinePrice"]} đ",
-                                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black54),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )),
-                            ],
+                        ] else if (widget.giftItem != null) ...[
+                          Text(widget.giftItem!["name"].toString().toUpperCase(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, height: 1.2)),
+                          const SizedBox(height: 8),
+                          Text("Số lượng: ${widget.quantity}", style: const TextStyle(color: Colors.black54, fontSize: 14)),
+                        ],
+
+                        // --- LIST COMBO HIỂN THỊ DẠNG TEXT GỌN ---
+                        if (widget.selectedCombos != null && widget.selectedCombos!.isNotEmpty) ...[
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                            child: Divider(height: 1, color: Colors.black12),
+                          ),
+                          ...widget.selectedCombos!.map((combo) => Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("${combo["name"]} x${combo["quantity"]}", style: const TextStyle(color: Colors.black54, fontSize: 14)),
+                                Text("${combo["onlinePrice"]}đ", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black38)),
+                              ],
+                            ),
+                          )),
+                        ],
+
+                        const SizedBox(height: 40),
+
+                        // --- PHƯƠNG THỨC THANH TOÁN ---
+                        const Text("PHƯƠNG THỨC THANH TOÁN", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black38, letterSpacing: 1)),
+                        const SizedBox(height: 16),
+                        _buildPaymentOption(Icons.credit_card, "Thẻ tín dụng / Ghi nợ", "credit"),
+                        _buildPaymentOption(Icons.account_balance, "Thẻ nội địa (ATM)", "atm"),
+                        _buildPaymentOption(Icons.account_balance_wallet, "Ví điện tử (Momo, ZaloPay)", "wallet"),
+
+                        const SizedBox(height: 40),
+                        
+                        // --- MÃ GIẢM GIÁ ---
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.03),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const TextField(
+                            decoration: InputDecoration(
+                              hintText: "Nhập mã giảm giá (nếu có)",
+                              hintStyle: TextStyle(fontSize: 14, color: Colors.black26),
+                              border: InputBorder.none,
+                              suffixIcon: Icon(Icons.confirmation_number_outlined, size: 20, color: Colors.black26),
+                            ),
                           ),
                         ),
                       ],
-
-                      // --- PHƯƠNG THỨC THANH TOÁN ---
-                      _buildSectionTitle("Phương thức thanh toán"),
-                      
-                      _buildPaymentMethod(Icons.credit_card_outlined, "Thẻ tín dụng", "credit"),
-                      _buildPaymentMethod(Icons.account_balance_outlined, "Thẻ nội địa (ATM)", "atm"),
-                      _buildPaymentMethod(Icons.account_balance_wallet_outlined, "Ví điện tử", "wallet"),
-
-                      const SizedBox(height: 120), 
-                    ],
+                    ),
                   ),
                 ),
               ),
 
-              // --- BOTTOM BAR ---
+              // --- THANH THANH TOÁN DƯỚI ĐÁY ĐỒNG BỘ ---
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                decoration: BoxDecoration(
+                padding: const EdgeInsets.all(20),
+                decoration: const BoxDecoration(
                   color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 20, offset: const Offset(0, -5))],
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],
                 ),
                 child: SafeArea(
                   top: false,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text("Tổng Tiền", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black54, letterSpacing: 0.5)),
-                            const SizedBox(height: 4),
-                            Text(
-                              "${widget.totalPrice} đ",
-                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: primaryRed),
-                            ),
-                          ],
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text("TỔNG CỘNG", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black38)),
+                          const SizedBox(height: 4),
+                          Text(
+                            "${widget.totalPrice} đ",
+                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: primaryRed),
+                          ),
+                        ],
                       ),
                       ElevatedButton(
-                        onPressed: (selectedMethod != null) ? () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const SuccessScreen()),
-                          );
+                        onPressed: selectedMethod != null ? () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const SuccessScreen()));
                         } : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryRed,
-                          disabledBackgroundColor: Colors.grey[200],
+                          foregroundColor: Colors.white,
+                          disabledBackgroundColor: Colors.black12,
                           elevation: 0,
-                          padding: const EdgeInsets.symmetric(horizontal: 44, vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                         ),
-                        child: const Text("Thanh toán", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                        child: const Text("XÁC NHẬN", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1)),
                       ),
                     ],
                   ),
                 ),
               ),
-              ],
-            ),
+            ],
           ),
         ),
       ),
     );
   }
-
-  Widget _buildInfoItem(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, size: 14, color: Colors.black38),
-        const SizedBox(width: 6),
-        Text(text, style: const TextStyle(color: Colors.black54, fontSize: 13)),
-      ],
-    );
-  }
 }
+
