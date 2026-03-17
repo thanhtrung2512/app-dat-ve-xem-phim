@@ -10,39 +10,40 @@ class ShowtimeScreen extends StatefulWidget {
   State<ShowtimeScreen> createState() => _ShowtimeScreenState();
 }
 
-class _ShowtimeScreenState extends State<ShowtimeScreen> with SingleTickerProviderStateMixin {
-  final Color darkBg = const Color(0xFF0A0A0A);
+class _ShowtimeScreenState extends State<ShowtimeScreen> {
+  // --- CONSTANTS ---
   final Color primaryRed = const Color(0xFFE51937);
-  final Color ageBadgeColor = const Color(0xFFD61884);
-  final Color seatAvailableColor = const Color(0xFF28A745);
+  final Color textSecondary = Colors.black38;
+  final Color textPrimary = Colors.black;
 
+  // --- STATE ---
   int selectedDateIndex = 0;
-  
-  // Dữ liệu mẫu Ngày
+  String selectedRegion = "Miền Bắc";
+
+  // --- MOCK DATA ---
   final List<Map<String, String>> dates = [
-    {"day": "Sun", "date": "15"},
-    {"day": "Mon", "date": "16"},
-    {"day": "Tue", "date": "17"},
-    {"day": "Wed", "date": "18"},
-    {"day": "Thu", "date": "19"},
-    {"day": "Fri", "date": "20"},
-    {"day": "Sat", "date": "21"},
+    {"day": "CN", "date": "15/03"},
+    {"day": "T2", "date": "16/03"},
+    {"day": "T3", "date": "17/03"},
+    {"day": "T4", "date": "18/03"},
+    {"day": "T5", "date": "19/03"},
+    {"day": "T6", "date": "20/03"},
+    {"day": "T7", "date": "21/03"},
   ];
 
-  late TabController _regionTabController;
+  final List<String> regions = ["Miền Bắc", "Miền Trung", "Miền Nam"];
 
-  // Dữ liệu mẫu phân loại trực tiếp: Miền -> Danh sách Rạp
   final Map<String, List<Map<String, dynamic>>> cinemasByRegion = {
     "Miền Bắc": [
       {
         "cinemaName": "TT Cinema Hà Đông",
         "formats": [
           {
-            "name": "2D | Phụ đề tiếng Anh",
+            "name": "2D PHỤ ĐỀ TIẾNG ANH",
             "times": [
               {"start": "19:00", "end": "21:00", "booked": 45, "total": 120, "room": "Rạp 04", "status": "available"},
               {"start": "21:00", "end": "23:00", "booked": 79, "total": 120, "room": "Rạp 04", "status": "available"},
-              {"start": "23:40", "end": "25:40", "booked": 120, "total": 120, "room": "Rạp 06", "status": "sold_out"},
+              {"start": "23:40", "end": "01:40", "booked": 120, "total": 120, "room": "Rạp 06", "status": "sold_out"},
             ]
           }
         ]
@@ -51,7 +52,7 @@ class _ShowtimeScreenState extends State<ShowtimeScreen> with SingleTickerProvid
         "cinemaName": "TT Cinema Cầu Giấy",
         "formats": [
           {
-            "name": "2D | Lồng tiếng",
+            "name": "2D LỒNG TIẾNG",
             "times": [
               {"start": "10:00", "end": "12:00", "booked": 15, "total": 100, "room": "Rạp 01", "status": "available"},
             ]
@@ -64,7 +65,7 @@ class _ShowtimeScreenState extends State<ShowtimeScreen> with SingleTickerProvid
         "cinemaName": "TT Cinema Sơn Trà",
         "formats": [
           {
-            "name": "2D | Phụ đề tiếng Việt",
+            "name": "2D PHỤ ĐỀ TIẾNG VIỆT",
             "times": [
               {"start": "14:00", "end": "16:00", "booked": 50, "total": 120, "room": "Rạp 03", "status": "available"},
             ]
@@ -77,7 +78,7 @@ class _ShowtimeScreenState extends State<ShowtimeScreen> with SingleTickerProvid
         "cinemaName": "TT Cinema Gò Vấp",
         "formats": [
           {
-            "name": "IMAX | Phụ đề tiếng Anh",
+            "name": "IMAX PHỤ ĐỀ TIẾNG ANH",
             "times": [
               {"start": "19:30", "end": "21:30", "booked": 200, "total": 250, "room": "IMAX 1", "status": "available"},
             ]
@@ -88,126 +89,164 @@ class _ShowtimeScreenState extends State<ShowtimeScreen> with SingleTickerProvid
   };
 
   @override
-  void initState() {
-    super.initState();
-    _regionTabController = TabController(length: 3, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _regionTabController.dispose();
-    super.dispose();
-  }
-
-  // --- WIDGET: Lưới Suất Chiếu ---
-  Widget _buildTimeGrid(List times) {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: times.map<Widget>((timeData) {
-        bool isSoldOut = timeData["status"] == "sold_out";
-
-        return GestureDetector( // Đổi InkWell thành GestureDetector để nhận chạm nhạy hơn trên Web
-          onTap: isSoldOut ? null : () {
-            // Chuyển trang khi có dữ liệu
-            Navigator.push(
-              context, 
-              MaterialPageRoute(
-                builder: (_) => BookingScreen(
-                  movie: widget.movie, 
-                  timeData: timeData, // Truyền thông tin suất chiếu sang
-                ),
-              )
-            );
-          },
-          child: Container(
-            width: 105,
-            decoration: BoxDecoration(
-              color: isSoldOut ? const Color(0xFFF3F3F3) : Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.black12, width: 1.0),
-            ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 8, bottom: 4, left: 4, right: 4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      Text(
-                        isSoldOut ? "Đã bán hết" : timeData["start"],
-                        style: TextStyle(
-                          color: isSoldOut ? Colors.black38 : Colors.black,
-                          fontSize: isSoldOut ? 12 : 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (!isSoldOut)
-                        Text(" ~${timeData["end"]}", style: const TextStyle(color: Colors.black38, fontSize: 10)),
-                    ],
-                  ),
-                ),
-                Container(height: 1, color: Colors.black12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        isSoldOut ? "" : "${timeData["booked"]}/${timeData["total"]}",
-                        style: TextStyle(color: seatAvailableColor, fontSize: 10, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        timeData["room"],
-                        style: TextStyle(color: isSoldOut ? Colors.black26 : Colors.black, fontSize: 10, fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: _buildAppBar(),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDatePicker(),
+              _buildRegionFilter(),
+              Expanded(
+                child: _buildCinemaList(),
+              ),
+            ],
           ),
-        );
-      }).toList(),
+        ),
+      ),
     );
   }
 
-  // --- WIDGET: Danh Sách Rạp Theo Miền ---
-  Widget _buildCinemaList(List<Map<String, dynamic>> cinemas) {
+  // --- WIDGETS ---
+
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 20),
+        onPressed: () => Navigator.pop(context),
+      ),
+      title: Text(
+        widget.movie["name"]?.toString().toUpperCase() ?? "SHOWTIME",
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 14,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 2.0,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDatePicker() {
+    return Container(
+      height: 60,
+      margin: const EdgeInsets.symmetric(vertical: 20),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: dates.length,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemBuilder: (context, index) {
+          bool isSelected = selectedDateIndex == index;
+          return GestureDetector(
+            onTap: () => setState(() => selectedDateIndex = index),
+            child: Padding(
+              padding: const EdgeInsets.only(right: 32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    dates[index]["date"]!,
+                    style: TextStyle(
+                      color: isSelected ? textPrimary : textSecondary,
+                      fontSize: 18,
+                      fontWeight: isSelected ? FontWeight.w900 : FontWeight.w500,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: isSelected ? 12 : 0,
+                    height: 2,
+                    color: primaryRed,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildRegionFilter() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+      child: Row(
+        children: regions.map((region) {
+          bool isSelected = selectedRegion == region;
+          return GestureDetector(
+            onTap: () => setState(() => selectedRegion = region),
+            child: Padding(
+              padding: const EdgeInsets.only(right: 24),
+              child: Text(
+                region.toUpperCase(),
+                style: TextStyle(
+                  color: isSelected ? primaryRed : textSecondary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildCinemaList() {
+    final cinemas = cinemasByRegion[selectedRegion] ?? [];
     if (cinemas.isEmpty) {
-      return const Center(child: Text("Không có suất chiếu tại miền này", style: TextStyle(color: Colors.black54)));
+      return const Center(
+        child: Text(
+          "NO SHOWTIMES AVAILABLE",
+          style: TextStyle(color: Colors.black12, fontSize: 10, letterSpacing: 1.0),
+        ),
+      );
     }
-    
-    return ListView.separated(
+
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
       itemCount: cinemas.length,
-      separatorBuilder: (_, _) => Container(height: 8, color: const Color(0xFFF7F7F7)),
       itemBuilder: (context, index) {
         final cinema = cinemas[index];
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: Colors.white,
-              child: Text(
-                cinema["cinemaName"],
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+            Text(
+              cinema["cinemaName"].toString().toUpperCase(),
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.5,
               ),
             ),
+            const SizedBox(height: 20),
             ...cinema["formats"].map<Widget>((format) {
-              return Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(format["name"], style: const TextStyle(color: Colors.black54, fontSize: 13, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 12),
-                    _buildTimeGrid(format["times"]),
-                  ],
-                ),
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    format["name"],
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                      color: textSecondary.withValues(alpha: 0.5),
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  _buildTimeGrid(format["times"]),
+                  const SizedBox(height: 40),
+                ],
               );
             }),
           ],
@@ -216,142 +255,45 @@ class _ShowtimeScreenState extends State<ShowtimeScreen> with SingleTickerProvid
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    String movieName = widget.movie["name"] ?? "UNKNOWN MOVIE";
-    String ageRating = widget.movie["age"] ?? "T16";
-
-    return Scaffold(
-      backgroundColor: darkBg,
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 500), // Khớp tỉ lệ với Home/Movie Screen
-          child: Column(
-            children: [
-              // --- HEADER CUSTOM ---
-              Container(
-                color: primaryRed,
-                child: SafeArea(
-                  bottom: false,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        Expanded(
-                          child: Center(
-                            child: Text(movieName, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                          ),
-                        ),
-                        const SizedBox(width: 48),
-                      ],
-                    ),
+  Widget _buildTimeGrid(List times) {
+    return Wrap(
+      spacing: 30,
+      runSpacing: 20,
+      children: times.map<Widget>((timeData) {
+        bool isSoldOut = timeData["status"] == "sold_out";
+        return GestureDetector(
+          onTap: isSoldOut ? null : () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => BookingScreen(movie: widget.movie, timeData: timeData)),
+            );
+          },
+          child: Opacity(
+            opacity: isSoldOut ? 0.2 : 1.0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  timeData["start"],
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -1,
                   ),
                 ),
-              ),
-
-              // --- PHẦN THÂN TRẮNG BO GÓC ---
-              Expanded(
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-                  ),
-                  child: Column(
-                    children: [
-                      // Thanh Chọn Ngày
-                      Container(
-                        height: 80,
-                        margin: const EdgeInsets.only(top: 8),
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: dates.length,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemBuilder: (context, index) {
-                            bool isSelected = selectedDateIndex == index;
-                            return GestureDetector(
-                              onTap: () => setState(() => selectedDateIndex = index),
-                              child: Container(
-                                width: 60,
-                                margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: isSelected ? Colors.black : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(dates[index]["day"]!, style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontSize: 14)),
-                                    const SizedBox(height: 2),
-                                    Text(dates[index]["date"]!, style: TextStyle(color: isSelected ? Colors.white : Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const Divider(height: 1, color: Colors.black12),
-                      
-                      // Dải Thông Tin Phim
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                        color: const Color(0xFFF7F7F7),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: ageRating == "T18" ? primaryRed : ageBadgeColor,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(ageRating, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(movieName, style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
-                            ),
-                          ],
-                        ),
-                      ),
-                      
-                      // Tabs Miền
-                      TabBar(
-                        controller: _regionTabController,
-                        labelColor: primaryRed,
-                        unselectedLabelColor: Colors.black54,
-                        indicatorColor: primaryRed,
-                        tabs: const [
-                          Tab(text: "Miền Bắc"),
-                          Tab(text: "Miền Trung"),
-                          Tab(text: "Miền Nam"),
-                        ],
-                      ),
-                      const Divider(height: 1, color: Colors.black12),
-                      
-                      // Nội Dung Tabs (Vuốt để chuyển)
-                      Expanded(
-                        child: TabBarView(
-                          controller: _regionTabController,
-                          children: [
-                            _buildCinemaList(cinemasByRegion["Miền Bắc"]!),
-                            _buildCinemaList(cinemasByRegion["Miền Trung"]!),
-                            _buildCinemaList(cinemasByRegion["Miền Nam"]!),
-                          ],
-                        ),
-                      ),
-                    ],
+                Text(
+                  isSoldOut ? "SOLD OUT" : "${timeData["booked"]}/${timeData["total"]} SEATS",
+                  style: const TextStyle(
+                    fontSize: 8,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.black26,
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      }).toList(),
     );
   }
 }
