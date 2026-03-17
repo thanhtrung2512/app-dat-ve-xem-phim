@@ -1,45 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'movie_screen.dart';
-import 'showtime_screen.dart'; // Đã import ShowtimeScreen
-import 'gift_screen.dart'; // Import màn hình Quà tặng
-
-// ==========================================
-// 1. CÁC TRANG DUMMY (CÁC TRANG ĐÍCH KHI BẤM NÚT)
-// ==========================================
-class MovieDetailScreen extends StatelessWidget {
-  final Map movie;
-  const MovieDetailScreen({super.key, required this.movie});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(movie["name"]), backgroundColor: const Color(0xFF0A0A0A)),
-      backgroundColor: const Color(0xFF0A0A0A),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.asset(movie["img"], height: 400, fit: BoxFit.fill), 
-            ),
-            const SizedBox(height: 20),
-            Text(movie["name"], style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2.0)),
-            const SizedBox(height: 10),
-            Text("Thể loại: ${movie["type"]}", style: const TextStyle(color: Colors.white70, fontSize: 16)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class TicketPage extends StatelessWidget { const TicketPage({super.key}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text("Vé của tôi"), backgroundColor: const Color(0xFF0A0A0A)), backgroundColor: const Color(0xFF0A0A0A), body: const Center(child: Text("Danh sách vé của bạn", style: TextStyle(color: Colors.white, fontSize: 18)))); }
-class ProfilePage extends StatelessWidget { const ProfilePage({super.key}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text("Hồ sơ"), backgroundColor: const Color(0xFF0A0A0A)), backgroundColor: const Color(0xFF0A0A0A), body: const Center(child: Text("Thông tin cá nhân", style: TextStyle(color: Colors.white, fontSize: 18)))); }
-// GiftScreen đã được chuyển sang gift_screen.dart
-class CinemaPage extends StatelessWidget { const CinemaPage({super.key}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text("Hệ thống Rạp"), backgroundColor: const Color(0xFF0A0A0A)), backgroundColor: const Color(0xFF0A0A0A), body: const Center(child: Text("Danh sách Rạp TT CINEMA", style: TextStyle(color: Colors.white, fontSize: 18)))); }
-class PromotionScreen extends StatelessWidget { const PromotionScreen({super.key}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text("Khuyến mãi"), backgroundColor: const Color(0xFF0A0A0A)), backgroundColor: const Color(0xFF0A0A0A), body: const Center(child: Text("Các chương trình khuyến mãi", style: TextStyle(color: Colors.white, fontSize: 18)))); }
+import 'showtime_screen.dart';
+import 'gift_screen.dart';
+import 'cinema_screen.dart';
+import 'promotion_screen.dart';
 
 
 // ==========================================
@@ -191,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // --- WIDGET: THẺ PHIM ---
   Widget movieCard(Map movie) {
     return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MovieDetailScreen(movie: movie))),
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ShowtimeScreen(movie: movie))),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
         decoration: BoxDecoration(
@@ -464,7 +429,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                       ),
-                      _buildNavItem(Icons.storefront_outlined, "Rạp", const CinemaPage()),
+                      _buildNavItem(Icons.storefront_outlined, "Rạp", const CinemaScreen()),
                       _buildNavItem(Icons.local_offer_outlined, "Khuyến mãi", const PromotionScreen()),
                     ],
                   ),
