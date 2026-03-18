@@ -21,7 +21,7 @@ class _MovieScreenState extends State<MovieScreen>
   List nowShowingMovies = [
     {
       "name": "TÀI",
-      "img": "assets/images/km.jpg",
+      "img": "assets/images/p1.jpg",
       "rate": "8.8",
       "type": "Drama",
       "duration": "100 Phút",
@@ -39,7 +39,7 @@ class _MovieScreenState extends State<MovieScreen>
     },
     {
       "name": "CÚ NHẢY KỲ DIỆU",
-      "img": "assets/images/km.jpg",
+      "img": "assets/images/p3.jpg",
       "rate": "8.2",
       "type": "Animation",
       "duration": "105 Phút",
@@ -51,7 +51,7 @@ class _MovieScreenState extends State<MovieScreen>
   List comingSoonMovies = [
     {
       "name": "AVENGERS: DOOMSDAY",
-      "img": "assets/images/km.jpg",
+      "img": "assets/images/p3.jpg",
       "rate": "9.0",
       "type": "Hành động",
       "duration": "150 Phút",
@@ -60,7 +60,7 @@ class _MovieScreenState extends State<MovieScreen>
     },
     {
       "name": "SPIDER-MAN 4",
-      "img": "assets/images/QNT.jpeg",
+      "img": "assets/images/p2.jpg",
       "rate": "8.9",
       "type": "Hành động, Viễn tưởng",
       "duration": "130 Phút",

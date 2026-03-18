@@ -33,15 +33,15 @@ class _HomeScreenState extends State<HomeScreen> {
   final Color darkCard = const Color(0xFF151515);
 
   List promoImages = [
-    "assets/images/km.jpg", 
-    "assets/images/km.jpg",
-    "assets/images/km.jpg",
+    "assets/images/c1.jpg", 
+    "assets/images/c2.jpg",
+    "assets/images/c3.jpg",
   ];
 
   List movies = [
     {
       "name": "PIRATES OF THE CARIBBEAN",
-      "img": "assets/images/km.jpg", 
+      "img": "assets/images/p1.jpg", 
       "rate": "8.8",
       "type": "Hành động",
       "duration": "140 Phút",
@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     },
     {
       "name": "LẬT MẶT",
-      "img": "assets/images/QNT.jpeg", 
+      "img": "assets/images/p2.jpg", 
       "rate": "8.2",
       "type": "Hành động",
       "duration": "115 Phút",
