@@ -59,7 +59,7 @@ class _BookingScreenState extends State<BookingScreen> {
           color: isSold ? Colors.black12 : (isSelected ? primaryRed : Colors.white),
           borderRadius: BorderRadius.circular(4),
           border: Border.all(color: isSelected ? primaryRed : Colors.black12),
-          boxShadow: isSelected ? [BoxShadow(color: primaryRed.withOpacity(0.3), blurRadius: 8)] : null,
+          boxShadow: isSelected ? [BoxShadow(color: primaryRed.withValues(alpha: 0.3), blurRadius: 8)] : null,
         ),
         alignment: Alignment.center,
         child: Text(seatId, style: TextStyle(color: isSold ? Colors.black26 : (isSelected ? Colors.white : Colors.black54), fontSize: 7, fontWeight: FontWeight.bold)),
@@ -94,7 +94,7 @@ class _BookingScreenState extends State<BookingScreen> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: Colors.black12),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15)],
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 15)],
                   ),
                   child: Column(
                     children: [
@@ -163,7 +163,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       decoration: BoxDecoration(
                         color: primaryRed,
                         borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
-                        boxShadow: [BoxShadow(color: primaryRed.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))],
+                        boxShadow: [BoxShadow(color: primaryRed.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
                       ),
                       child: Row(
                         children: [
@@ -188,7 +188,7 @@ class _BookingScreenState extends State<BookingScreen> {
                           Column(
                             children: [
                               const SizedBox(height: 30),
-                              Container(height: 4, width: 220, decoration: BoxDecoration(color: Colors.black.withOpacity(0.08), borderRadius: BorderRadius.circular(2))),
+                              Container(height: 4, width: 220, decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(2))),
                               const SizedBox(height: 8),
                               Text(AppState().translate("MÀN HÌNH", "SCREEN"), style: const TextStyle(color: Colors.black26, fontSize: 10, fontWeight: FontWeight.bold)),
                               const SizedBox(height: 40),
@@ -228,7 +228,7 @@ class _BookingScreenState extends State<BookingScreen> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
-                                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, -5))],
+                                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 20, offset: const Offset(0, -5))],
                               ),
                               child: selectedSeats.isEmpty ? const SizedBox() : SingleChildScrollView(
                                 physics: const NeverScrollableScrollPhysics(),
@@ -258,7 +258,7 @@ class _BookingScreenState extends State<BookingScreen> {
                                         minimumSize: const Size(double.infinity, 55), 
                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                         elevation: 8,
-                                        shadowColor: primaryRed.withOpacity(0.4),
+                                        shadowColor: primaryRed.withValues(alpha: 0.4),
                                       ),
                                       onPressed: () {
                                         final ticket = {

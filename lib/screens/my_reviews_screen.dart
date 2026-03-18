@@ -134,12 +134,12 @@ class _MyReviewsScreenState extends State<MyReviewsScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
-        border: Border.all(color: Colors.black.withOpacity(0.04)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.04)),
       ),
       child: IntrinsicHeight(
         child: Row(
@@ -175,7 +175,7 @@ class _MyReviewsScreenState extends State<MyReviewsScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.amber.withOpacity(0.12),
+                            color: Colors.amber.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -226,8 +226,8 @@ class _MyReviewsScreenState extends State<MyReviewsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 15, offset: const Offset(0, 5))],
-        border: Border.all(color: Colors.black.withOpacity(0.02)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 15, offset: const Offset(0, 5))],
+        border: Border.all(color: Colors.black.withValues(alpha: 0.02)),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),

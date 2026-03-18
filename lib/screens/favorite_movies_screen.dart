@@ -56,7 +56,7 @@ class _FavoriteMoviesScreenState extends State<FavoriteMoviesScreen> {
       decoration: BoxDecoration(
         color: primaryRed,
         borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24)),
-        boxShadow: [BoxShadow(color: primaryRed.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: primaryRed.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Row(
         children: [
@@ -82,7 +82,7 @@ class _FavoriteMoviesScreenState extends State<FavoriteMoviesScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.favorite_border, color: Colors.black.withOpacity(0.05), size: 100),
+          Icon(Icons.favorite_border, color: Colors.black.withValues(alpha: 0.05), size: 100),
           const SizedBox(height: 16),
           Text(AppState().translate("Kho phim yêu thích của bạn đang trống", "Your favorite movies collection is empty"), 
             style: const TextStyle(color: Colors.black38, fontSize: 14, fontWeight: FontWeight.w500)
@@ -104,12 +104,12 @@ class _FavoriteMoviesScreenState extends State<FavoriteMoviesScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             )
           ],
-          border: Border.all(color: Colors.black.withOpacity(0.03)),
+          border: Border.all(color: Colors.black.withValues(alpha: 0.03)),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
